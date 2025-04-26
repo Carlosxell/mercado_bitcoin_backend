@@ -3,12 +3,12 @@ let router = express.Router();
 
 const APP = require('../src/app.js');
 const template = require('../src/template.js');
-const { createSSRApp } = require('vue');
+const { createApp } = require('vue');
 const { renderToString } = require('vue/server-renderer');
 
 
 router.get('/', async (req, res, next) => {
-	const appInstance = await createSSRApp(APP);
+	const appInstance = await createApp(APP);
 	const AppHTML = await renderToString(appInstance);
 
 	const HTML = template.render(AppHTML);
