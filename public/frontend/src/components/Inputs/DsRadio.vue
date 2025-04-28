@@ -44,13 +44,13 @@ const handleInput = (event) => {
 
 <style lang="scss">
 .dsRadio {
-  cursor: pointer;
   position: relative;
   overflow: hidden;
-  padding: .75rem 1rem;
+  padding: .75rem 0;
 
   &__label {
     align-items: center;
+    cursor: pointer;
     display: inline-flex;
     font-size: 1rem;
     font-weight: 500;
@@ -71,7 +71,7 @@ const handleInput = (event) => {
     &:after {
       background-color: transparent;
       height: .75rem;
-      left: .36rem;
+      left: .38rem;
       right: 0;
       transform: scale(1);
       transform-origin: center center;
@@ -82,8 +82,8 @@ const handleInput = (event) => {
     &:before {
       border: .175rem solid var(--color-primary);
       left: 0;
-      height: 1.25rem;
-      width: 1.25rem;
+      height: 1.5rem;
+      width: 1.5rem;
     }
   }
 

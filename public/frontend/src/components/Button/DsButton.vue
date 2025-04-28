@@ -18,14 +18,14 @@ defineProps({
 
 <style lang="scss">
 .dsButton {
-  border: 1px solid var(--color-primary);
+  border: .0625rem solid var(--color-primary);
   background-color: var(--color-primary);
   border-radius: .25rem;
   color: var(--color-light);
   font-size: 1rem;
   font-weight: 500;
   line-height: 1.5rem;
-  padding: .5rem .75rem;
+  padding: .25rem .75rem;
   position: relative;
   transition: opacity .15s ease-in-out;
   text-align: center;
@@ -43,10 +43,7 @@ defineProps({
     cursor: pointer;
   }
 
-  @media(min-width: 768px) {
-    font-size: 1.25rem;
-    padding: .5rem 1rem;
-  }
+  @media(min-width: 768px) {}
 
   &--full {
     width: 100%;
