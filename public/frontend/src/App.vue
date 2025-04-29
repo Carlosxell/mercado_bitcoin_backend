@@ -5,8 +5,9 @@
     <DsStepper @clickedNextStep="handleNextStep"
                @clickedPreviousStep="handlePreviousStep"
                :activeStep="activeStep"
-               :disabledNextStep="disabledNextStep"
-               :nextStepText="(activeStep > 2) ? 'Cadastrar' : 'Continuar'"
+               :disabledNextStep="sending || disabledNextStep"
+               :disabledPreviousStep="sending"
+               :nextStepText="sending ? 'Enviando dados' : (activeStep > 2) ? 'Cadastrar' : 'Continuar'"
                :steps="steps">
       <template #step-0>
         <DsInput label="Endereço de e-mail"
@@ -38,6 +39,7 @@
 
       <template #step-3>
         <FormStepConfirm @updateForm="handleUpdateForm"
+                         :disabledForm="sending"
                          :formDefault="form"
                          :typeDocument="form.documentType" />
       </template>
@@ -53,6 +55,8 @@ import DsInput from '@/components/Inputs/DsInput.vue';
 import FormStepUser from '@/components/Forms/FormStepUser.vue';
 import DsRadio from "@/components/Inputs/DsRadio.vue";
 import FormStepConfirm from '@/components/Forms/FormStepConfirm.vue';
+
+import { SendData } from '@/services/RegistrationService'
 
 import { useEmailValidation } from '@/composables/validations/EmailValidation';
 import { useMinLengthValidation } from '@/composables/validations/MinlengthValidation';
@@ -76,6 +80,8 @@ const radioList = [
   { label: 'Pessoa física', value: 'PF' },
   { label: 'Pessoa jurídica', value: 'PJ' }
 ];
+
+const sending = ref(false);
 
 const steps = computed(() => {
   const { value } = form;
@@ -114,10 +120,16 @@ const handlePreviousStep = () => {
 
 const handleUpdateForm = (value) => (form.value = { ...form.value, ...value });
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   let { date, document, documentType, email, name, password, phone } = form.value;
-  console.info('handleSubmit', form.value);
-};
+  sending.value = true;
+
+  try {
+    await SendData({ date, document, documentType, email, name, password, phone });
+  } finally {
+    sending.value = true;
+  }
+ };
 </script>
 
 <style lang="scss">

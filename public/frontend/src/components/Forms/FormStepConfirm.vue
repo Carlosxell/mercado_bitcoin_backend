@@ -1,30 +1,36 @@
 <template>
   <div class="formStepOne">
-    <DsInput label="Endereço de e-mail"
+    <DsInput :disabled="disabledForm"
+             label="Endereço de e-mail"
              placeholder="example@gmail.com"
              type="email"
              v-model="form.email" />
 
-    <DsInput :label="(typeDocument === 'PF') ? 'Nome' : 'Razão social'"
+    <DsInput :disabled="disabledForm"
+             :label="(typeDocument === 'PF') ? 'Nome' : 'Razão social'"
              placeholder="Ex: João Gomes"
              v-model="form.name" />
 
-    <DsInput :label="(typeDocument === 'PF') ? 'CPF' : 'CNPJ'"
+    <DsInput :disabled="disabledForm"
+             :label="(typeDocument === 'PF') ? 'CPF' : 'CNPJ'"
              :mask="(typeDocument === 'PF') ? '###.###.###-##' : '##.###.###/####-##'"
              :placeholder="(typeDocument === 'PF') ? '000.000.000-00' : '00.000.000/0000-00'"
              v-model="form.document" />
 
-    <DsInput :label="`Data de ${(typeDocument === 'PF') ? 'nascimento' : 'abertura'}`"
+    <DsInput :disabled="disabledForm"
+             :label="`Data de ${(typeDocument === 'PF') ? 'nascimento' : 'abertura'}`"
              placeholder="Ex: 21/11/1989"
              mask="##/##/####"
              v-model="form.date" />
 
-    <DsInput label="Telefone"
+    <DsInput :disabled="disabledForm"
+             label="Telefone"
              placeholder="(00) 0000-00000"
              mask="###########"
              v-model="form.phone" />
 
-    <DsInput label="Sua senha"
+    <DsInput :disabled="disabledForm"
+             label="Sua senha"
              placeholder="******"
              type="password"
              v-model="form.password" />
@@ -43,6 +49,7 @@ import { useCnpjValidation } from '@/composables/validations/CNPJValidation';
 import { useDateValidation } from '@/composables/validations/DateValidation';
 
 const props = defineProps({
+  disabledForm: { default: false, type: Boolean },
   formDefault: { default: () => {}, type: Object },
   typeDocument: { default: 'PF', type: String },
 })
