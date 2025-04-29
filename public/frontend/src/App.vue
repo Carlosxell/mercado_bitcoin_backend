@@ -8,7 +8,8 @@
                :disabledNextStep="sending || disabledNextStep"
                :disabledPreviousStep="sending"
                :nextStepText="sending ? 'Enviando dados' : (activeStep > 2) ? 'Cadastrar' : 'Continuar'"
-               :steps="steps">
+               :steps="steps"
+               v-if="!sended">
       <template #step-0>
         <DsInput label="Endereço de e-mail"
                  placeholder="example@gmail.com"
@@ -44,6 +45,11 @@
                          :typeDocument="form.documentType" />
       </template>
     </DsStepper>
+
+    <div class="appContent__sendedMessage" v-if="sended">
+      <p>Dados enviados com sucesso !</p>
+      <DsButton @click="resetForm" text="Voltar" />
+    </div>
   </form>
 </template>
 
@@ -60,6 +66,7 @@ import { SendData } from '@/services/RegistrationService'
 
 import { useEmailValidation } from '@/composables/validations/EmailValidation';
 import { useMinLengthValidation } from '@/composables/validations/MinlengthValidation';
+import DsButton from "@/components/Button/DsButton.vue";
 
 const { validateEmail } = useEmailValidation();
 const { validateMinLength } = useMinLengthValidation();
@@ -82,6 +89,7 @@ const radioList = [
 ];
 
 const sending = ref(false);
+const sended = ref(false);
 
 const steps = computed(() => {
   const { value } = form;
@@ -120,14 +128,32 @@ const handlePreviousStep = () => {
 
 const handleUpdateForm = (value) => (form.value = { ...form.value, ...value });
 
+const resetForm = () => {
+  form.value = {
+    date: '',
+    document: '',
+    documentType: 'PF',
+    email: '',
+    name: '',
+    password: '',
+    phone: '',
+    userStepValid: true,
+    confirmStepValid: false,
+  }
+
+  activeStep.value = 0;
+  sended.value = false;
+}
+
 const handleSubmit = async () => {
   let { date, document, documentType, email, name, password, phone } = form.value;
   sending.value = true;
 
   try {
     await SendData({ date, document, documentType, email, name, password, phone });
+    sended.value = true;
   } finally {
-    sending.value = true;
+    sending.value = false;
   }
  };
 </script>
@@ -170,6 +196,14 @@ body {
 .appContent {
   max-width: 35.5rem;
   margin: 2.5rem auto;
+
+  &__sendedMessage {
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.1rem;
+    margin: 0.5rem 0 1.5rem;
+    text-align: center;
+  }
 }
 
 .gridA {
