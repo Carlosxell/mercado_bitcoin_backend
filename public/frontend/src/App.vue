@@ -5,6 +5,7 @@
     <DsStepper @clickedNextStep="handleNextStep"
                @clickedPreviousStep="handlePreviousStep"
                :activeStep="activeStep"
+               :disabledNextStep="disabledNextStep"
                :nextStepText="(activeStep > 2) ? 'Cadastrar' : 'Continuar'"
                :steps="steps">
       <template #step-0>
@@ -51,7 +52,13 @@ import DsStepper from '@/components/Stepper/DsStepper.vue';
 import DsInput from '@/components/Inputs/DsInput.vue';
 import FormStepUser from '@/components/Forms/FormStepUser.vue';
 import DsRadio from "@/components/Inputs/DsRadio.vue";
-import FormStepConfirm from "@/components/Forms/FormStepConfirm.vue";
+import FormStepConfirm from '@/components/Forms/FormStepConfirm.vue';
+
+import { useEmailValidation } from '@/composables/validations/EmailValidation';
+import { useMinLengthValidation } from '@/composables/validations/MinlengthValidation';
+
+const { validateEmail } = useEmailValidation();
+const { validateMinLength } = useMinLengthValidation();
 
 const activeStep = ref(0);
 const form = ref({
@@ -62,11 +69,14 @@ const form = ref({
   name: '',
   password: '',
   phone: '',
+  userStepValid: true,
+  confirmStepValid: false,
 });
 const radioList = [
   { label: 'Pessoa física', value: 'PF' },
   { label: 'Pessoa jurídica', value: 'PJ' }
 ];
+
 const steps = computed(() => {
   const { value } = form;
 
@@ -78,19 +88,34 @@ const steps = computed(() => {
   ]
 });
 
+const disabledNextStep = computed(() => {
+  if (activeStep.value === 0) { return !validateEmail(form.value.email); }
+
+  if (activeStep.value === 1) { return form.value.userStepValid; }
+
+  if (activeStep.value === 2) { return !validateMinLength(form.value.password, 6); }
+
+  if (activeStep.value === 3) { return form.value.confirmStepValid; }
+
+  return false;
+});
+
 const handleNextStep = () => {
-  if (activeStep.value < (steps.value.length - 1)) { activeStep.value++; }
+  if(activeStep.value < (steps.value.length - 1)) {
+    activeStep.value++;
+  } else {
+    handleSubmit();
+  }
 };
+
 const handlePreviousStep = () => {
   if (activeStep.value > 0) { activeStep.value--; }
 };
 
-const handleUpdateForm = (value) => {
-  console.info('FORM', form.value);
-  console.info('handleUpdateForm', value);
-};
+const handleUpdateForm = (value) => (form.value = { ...form.value, ...value });
 
 const handleSubmit = () => {
+  let { date, document, documentType, email, name, password, phone } = form.value;
   console.info('handleSubmit', form.value);
 };
 </script>

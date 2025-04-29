@@ -10,6 +10,7 @@
              v-model="form.name" />
 
     <DsInput :label="(typeDocument === 'PF') ? 'CPF' : 'CNPJ'"
+             :mask="(typeDocument === 'PF') ? '###.###.###-##' : '##.###.###/####-##'"
              :placeholder="(typeDocument === 'PF') ? '000.000.000-00' : '00.000.000/0000-00'"
              v-model="form.document" />
 
@@ -19,8 +20,8 @@
              v-model="form.date" />
 
     <DsInput label="Telefone"
-             placeholder="example@gmail.com"
-             mask="(##) ####-#####"
+             placeholder="(00) 0000-00000"
+             mask="###########"
              v-model="form.phone" />
 
     <DsInput label="Sua senha"
@@ -31,25 +32,54 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import {onMounted, ref, watch} from 'vue';
 import DsInput from '@/components/Inputs/DsInput.vue';
 
-defineProps({
+import { useEmailValidation } from '@/composables/validations/EmailValidation';
+import { useMinLengthValidation } from '@/composables/validations/MinlengthValidation';
+import { usePhoneValidation } from '@/composables/validations/PhoneValidation';
+import { useCpfValidation } from "@/composables/validations/CPFValidation";
+import { useCnpjValidation } from '@/composables/validations/CNPJValidation';
+import { useDateValidation } from '@/composables/validations/DateValidation';
+
+const props = defineProps({
   formDefault: { default: () => {}, type: Object },
   typeDocument: { default: 'PF', type: String },
 })
+
+const { validateMinLength } = useMinLengthValidation();
+const { validatePhone } = usePhoneValidation();
+const { validateCpf } = useCpfValidation();
+const { validateCnpj } = useCnpjValidation();
+const { validateDate } = useDateValidation();
+const { validateEmail } = useEmailValidation();
 
 const emit = defineEmits(['updateForm']);
 
 const form = ref({
   date: '',
   document: '',
-  documentType: 'PF',
   email: '',
+  name: '',
   password: '',
+  phone: '',
 });
 
-watch(() => form.value, (value) => emit('updateForm', { ...value }), { deep: true });
+onMounted(() => {
+  const { date = '', document = '', name = '', phone = '', email = '', password = ''} = props.formDefault;
+  form.value = { ...form.value, date, document, name, phone, email, password };
+});
+
+watch(() => form.value, (value) => {
+  const confirmStepValid =
+      validateMinLength(value.name, 3) &&
+      validateMinLength(value.document, 11) &&
+      validateMinLength(value.password, 6) &&
+      validateEmail(form.value.email) &&
+      validateDate(value.date, 11) &&
+      validatePhone(value.phone) && (props.typeDocument === 'PF' ? validateCpf(value.document) : validateCnpj(value.document));
+  emit('updateForm', { ...value, confirmStepValid: !confirmStepValid })
+}, { deep: true });
 </script>
 
 <style lang="scss">

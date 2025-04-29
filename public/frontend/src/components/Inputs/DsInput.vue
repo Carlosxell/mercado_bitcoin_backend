@@ -6,8 +6,9 @@
     <div class="dsInput__wrapper">
       <input @change="handleInput"
              @input="handleInput"
-             autocomplete="off"
+             autocomplete="new-password"
              class="dsInput__formInput"
+             :class="{ 'dsInput__formInput--error': errorMessages.length }"
              :disabled="disabled"
              :readonly="readonly"
              :value="modelValue || value"
@@ -31,7 +32,7 @@ import { getCurrentInstance, ref } from 'vue';
 const props = defineProps({
   clearable: { default: false, type: Boolean },
   disabled: { default: false, type: Boolean },
-  errorMessages: { default: () => [], type: Array },
+  errorMessages: { default: '', type: String },
   id: { type: String },
   label: { type: String },
   mask: { default: '', type: String },
@@ -62,6 +63,7 @@ function handleClickClearable() {
 <style lang="scss">
 .dsInput {
   margin-bottom: 1.25rem;
+  position: relative;
 
   &__formLabel {
     display: inline-block;
@@ -79,8 +81,9 @@ function handleClickClearable() {
   }
 
   &__formInput {
-    border: .065rem solid var(--color-black);
+    border: .065rem solid inherit;
     border-radius: .25rem;
+    color: var(--color-black);
     font-size: 1rem;
     min-height: 1.5rem;
     outline: .065rem solid inherit;
@@ -101,10 +104,21 @@ function handleClickClearable() {
       outline: .065rem solid var(--color-primary);
     }
 
-    &:-webkit-autofill,
-    &:-webkit-autofill:hover,
-    &:-webkit-autofill:focus {}
+    &--error {
+      color: var(--color-danger);
+    }
+  }
 
+  &__footer {
+    color: var(--color-danger);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.1rem;
+    left: 0;
+    line-height: 1rem;
+    margin-top: .25rem;
+    position: absolute;
+    top: 100%;
   }
 
   &__closeBtn {
